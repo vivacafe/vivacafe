@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Viva Kahve — Menü</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400&family=Instrument+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F6F5F1; --card:#FFFFFF; --ink:#1E201C;
+    --muted:#7B7D74; --faint:#A8A9A1; --olive:#515A44;
+    --rule:#E3E2DB; --rule-soft:#EDECE6;
+    --serif:"Newsreader", Georgia, "Times New Roman", serif;
+    --sans:"Instrument Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0;background:#E9E8E2}
+  body{color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
+  button{font-family:inherit;font-size:inherit;color:inherit;background:none;border:none;padding:0;cursor:pointer}
+  input,textarea,select{font-family:inherit;font-size:16px;color:var(--ink)}
+  :focus-visible{outline:1.5px solid var(--olive);outline-offset:2px;border-radius:2px}
+  @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+
+  .app{max-width:480px;margin:0 auto;background:var(--paper);min-height:100vh;position:relative;overflow-x:hidden}
+  @media (min-width:520px){ .app{box-shadow:0 0 60px -20px rgba(30,32,28,.22)} }
+  .boot{padding:140px 30px;text-align:center;color:var(--faint);font-size:13px}
+
+  .lang{display:inline-flex;border:1px solid var(--rule);border-radius:999px;overflow:hidden;background:rgba(255,255,255,.9);backdrop-filter:blur(8px)}
+  .lang button{padding:5px 11px;font-size:11.5px;color:var(--muted);letter-spacing:.06em}
+  .lang button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+  .lang-float{position:absolute;top:14px;right:14px;z-index:4}
+
+  /* ---------- giriş: tam ekrana sığar ---------- */
+  .intro{height:100vh;height:100dvh;display:flex;flex-direction:column;position:relative;overflow:hidden}
+  .intro-photo{flex:1 1 auto;min-height:0;width:100%;object-fit:cover;display:block;background:var(--rule-soft)}
+  .intro-body{flex:0 0 auto;padding:24px 28px calc(26px + env(safe-area-inset-bottom));text-align:center}
+  .intro-body h1{font-family:var(--serif);font-weight:300;font-size:clamp(30px,8vw,40px);line-height:1.04;margin:0 0 9px;letter-spacing:-.014em}
+  .intro-body .welcome{margin:0 auto 20px;font-size:13.5px;color:var(--muted);line-height:1.55;max-width:30ch;
+    display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+  .intro-body .hours{margin:14px 0 0;font-size:11.5px;color:var(--faint);letter-spacing:.04em}
+
+  /* ---------- kategoriler ---------- */
+  .masthead{padding:30px 26px 22px;text-align:center;position:relative}
+  .masthead h1{font-family:var(--serif);font-weight:300;font-size:34px;line-height:1.05;margin:0 0 8px;letter-spacing:-.012em}
+  .masthead p{margin:0;font-size:12px;color:var(--muted);letter-spacing:.03em}
+  .masthead-rule{width:30px;height:1px;background:var(--olive);margin:18px auto 0;opacity:.55}
+  .home-back{position:absolute;left:18px;top:26px;width:29px;height:29px;display:grid;place-items:center;border:1px solid var(--rule);border-radius:50%;color:var(--ink)}
+  .masthead .lang{position:absolute;right:18px;top:24px}
+
+  .cats{padding:0 18px 44px;display:grid;grid-template-columns:1fr 1fr;gap:22px 14px}
+  .cat{text-align:left;width:100%;display:block}
+  .cat img{width:100%;aspect-ratio:4/5;object-fit:cover;display:block;border-radius:3px;background:var(--rule-soft);transition:opacity .2s ease}
+  .cat:active img{opacity:.82}
+  .cat h2{font-family:var(--serif);font-weight:400;font-size:21px;line-height:1.2;margin:11px 0 2px;letter-spacing:-.005em}
+  .cat span{font-size:11.5px;color:var(--faint);letter-spacing:.02em}
+  .cats-empty{grid-column:1/-1;padding:50px 10px;text-align:center;color:var(--muted);font-size:13.5px;line-height:1.7}
+
+  /* ---------- ürünler ---------- */
+  .subbar{position:sticky;top:0;z-index:5;background:rgba(246,245,241,.94);backdrop-filter:blur(14px);
+    border-bottom:1px solid var(--rule-soft);padding:15px 18px;display:flex;align-items:center;gap:13px}
+  .back{width:29px;height:29px;display:grid;place-items:center;border:1px solid var(--rule);border-radius:50%;flex-shrink:0;color:var(--ink)}
+  .subbar h2{font-family:var(--serif);font-weight:400;font-size:22px;margin:0;line-height:1;letter-spacing:-.005em;flex:1}
+  .items{padding:4px 18px 44px}
+  .item{display:flex;gap:16px;padding:20px 0;width:100%;text-align:left;align-items:flex-start;border-bottom:1px solid var(--rule-soft)}
+  .item:last-child{border-bottom:none}
+  .item-body{flex:1;min-width:0}
+  .item-body h3{font-family:var(--serif);font-weight:400;font-size:20px;line-height:1.22;margin:0 0 5px;letter-spacing:-.005em}
+  .item-body p{margin:0 0 8px;font-size:13px;color:var(--muted);line-height:1.55;max-width:34ch;
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .item-foot{display:flex;align-items:center;gap:9px}
+  .item-price{font-size:13px;color:var(--olive);letter-spacing:.02em}
+  .item-alg{display:flex;gap:5px;color:var(--faint)}
+  .item-alg svg{width:13px;height:13px}
+  .item-thumb{width:80px;height:80px;object-fit:cover;border-radius:3px;flex-shrink:0;background:var(--rule-soft)}
+
+  /* ---------- detay ---------- */
+  .sheet-wrap{position:fixed;inset:0;z-index:40;display:none}
+  .sheet-wrap.open{display:block}
+  .sheet-bg{position:absolute;inset:0;background:rgba(30,32,28,.34);animation:fade .2s ease}
+  .sheet{position:absolute;left:50%;transform:translateX(-50%);bottom:0;width:100%;max-width:480px;max-height:90vh;
+    background:var(--card);border-radius:16px 16px 0 0;overflow-y:auto;animation:rise .28s cubic-bezier(.22,.8,.3,1)}
+  @keyframes fade{from{opacity:0}to{opacity:1}}
+  @keyframes rise{from{transform:translate(-50%,20%)}to{transform:translate(-50%,0)}}
+  .sheet-photo{width:100%;height:252px;object-fit:cover;display:block;background:var(--rule-soft)}
+  .sheet-close{position:absolute;top:14px;right:14px;width:32px;height:32px;border-radius:50%;
+    background:rgba(255,255,255,.92);display:grid;place-items:center;color:var(--ink);box-shadow:0 2px 10px rgba(30,32,28,.14)}
+  .sheet-body{padding:26px 26px calc(36px + env(safe-area-inset-bottom))}
+  .sheet-body h3{font-family:var(--serif);font-weight:300;font-size:31px;line-height:1.1;margin:0 0 7px;letter-spacing:-.015em}
+  .sheet-price{color:var(--olive);font-size:14px;margin:0 0 20px;letter-spacing:.02em}
+  .sheet-body .desc{font-size:14.5px;color:#54564E;line-height:1.65;margin:0 0 26px;max-width:38ch}
+  .allergens{border-top:1px solid var(--rule);padding-top:16px}
+  .allergens p{margin:0 0 11px;font-size:11.5px;color:var(--faint);letter-spacing:.02em}
+  .alg-list{display:flex;flex-wrap:wrap;gap:8px}
+  .alg-item{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;color:var(--ink);
+    border:1px solid var(--rule);border-radius:999px;padding:6px 12px 6px 10px}
+  .alg-item svg{width:15px;height:15px;color:var(--olive);flex-shrink:0}
+  .alg-none{font-size:13.5px;color:var(--muted)}
+
+  /* ---------- panel ---------- */
+  .adm-top{padding:24px 22px 18px;background:var(--card);border-bottom:1px solid var(--rule);display:flex;align-items:flex-start;gap:12px}
+  .adm-top h2{font-family:var(--serif);font-weight:400;font-size:24px;margin:0 0 3px;letter-spacing:-.008em}
+  .adm-top p{margin:0;font-size:12.5px;color:var(--muted)}
+  .adm-top .grow{flex:1;min-width:0}
+  .tabs{display:flex;gap:2px;padding:0 16px;background:var(--card);border-bottom:1px solid var(--rule);overflow-x:auto}
+  .tabs button{padding:13px 12px;font-size:13.5px;color:var(--muted);white-space:nowrap;border-bottom:1.5px solid transparent;margin-bottom:-1px}
+  .tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--olive)}
+  .panel{padding:22px 20px 60px}
+
+  .field{margin-bottom:17px}
+  .field label{display:block;font-size:12px;color:var(--muted);margin-bottom:7px;letter-spacing:.02em}
+  .field input[type=text],.field input[type=number],.field input[type=email],.field input[type=password],.field textarea,.field select{
+    width:100%;background:var(--card);border:1px solid var(--rule);border-radius:7px;padding:11px 12px}
+  .field textarea{min-height:76px;resize:vertical;line-height:1.55}
+  .field input::placeholder,.field textarea::placeholder{color:var(--faint)}
+  .field .hint{font-size:11.5px;color:var(--faint);margin:6px 0 0;line-height:1.5}
+  .row{display:flex;gap:10px}
+  .row>*{flex:1;min-width:0}
+  .flag{display:inline-block;font-size:10.5px;letter-spacing:.08em;color:var(--faint);
+    border:1px solid var(--rule);border-radius:3px;padding:1px 5px;margin-right:7px;vertical-align:1px}
+
+  .drop{display:flex;align-items:center;gap:14px;padding:14px;cursor:pointer;background:var(--card);border:1px solid var(--rule);border-radius:7px}
+  .drop:hover{border-color:var(--olive)}
+  .drop img{width:60px;height:60px;border-radius:4px;object-fit:cover;background:var(--rule-soft);flex-shrink:0}
+  .drop-txt{font-size:12.5px;color:var(--muted);line-height:1.5}
+  .drop input{display:none}
+
+  .btn{background:var(--ink);color:var(--paper);border-radius:7px;padding:13px 18px;font-weight:500;font-size:14px;width:100%}
+  .btn:active{opacity:.86}
+  .btn:disabled{opacity:.5;cursor:default}
+  .btn.ghost{background:var(--card);color:var(--ink);border:1px solid var(--rule);font-weight:400}
+  .btn.quiet{background:none;color:var(--muted);border:1px solid var(--rule);font-weight:400;font-size:13px;padding:11px 16px}
+  .btn-row{display:flex;gap:9px;margin-top:6px}
+  .logout{font-size:12px;color:var(--muted);border:1px solid var(--rule);border-radius:6px;padding:6px 10px;flex-shrink:0}
+
+  .list{display:flex;flex-direction:column;margin-bottom:8px;background:var(--card);border:1px solid var(--rule);border-radius:8px;overflow:hidden}
+  .list-row{display:flex;align-items:center;gap:13px;padding:11px 13px;border-bottom:1px solid var(--rule-soft)}
+  .list-row:last-child{border-bottom:none}
+  .list-row img{width:44px;height:44px;border-radius:4px;object-fit:cover;flex-shrink:0;background:var(--rule-soft)}
+  .list-row .meta{flex:1;min-width:0}
+  .list-row .meta strong{display:block;font-weight:500;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .list-row .meta small{font-size:11.5px;color:var(--muted)}
+  .list-row .warn{color:#B4714F}
+  .icon-btn{width:30px;height:30px;display:grid;place-items:center;border-radius:6px;color:var(--faint);flex-shrink:0}
+  .icon-btn:hover{background:var(--paper);color:var(--ink)}
+  .sec-title{font-size:12px;color:var(--faint);margin:0 0 11px;letter-spacing:.03em}
+  .hr{height:1px;background:var(--rule);margin:26px 0}
+  .empty{font-size:13px;color:var(--faint);padding:16px 0;margin:0}
+
+  .alg-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .alg-grid label{display:flex;align-items:center;gap:9px;font-size:13px;padding:10px 11px;border-radius:7px;
+    border:1px solid var(--rule);cursor:pointer;color:var(--muted);background:var(--card)}
+  .alg-grid label svg{width:17px;height:17px;flex-shrink:0;color:var(--faint)}
+  .alg-grid input{display:none}
+  .alg-grid label:has(input:checked){background:var(--olive);border-color:var(--olive);color:#F6F5F1}
+  .alg-grid label:has(input:checked) svg{color:#F6F5F1}
+
+  .qr-box{text-align:center;padding:4px 0 0}
+  .qr-box canvas,.qr-box .qr-fallback{background:var(--card);padding:16px;border-radius:8px;display:inline-block;border:1px solid var(--rule)}
+  .qr-fallback{font-size:12px;max-width:200px;line-height:1.5;color:var(--muted)}
+  .qr-link{margin:18px 0 8px;font-size:13px;color:var(--olive);word-break:break-all}
+  .qr-help{font-size:12.5px;color:var(--muted);line-height:1.65;text-align:left;margin-top:24px}
+
+  .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:26px;z-index:80;background:var(--ink);color:var(--paper);
+    padding:11px 20px;border-radius:999px;font-size:13.5px;font-weight:500;opacity:0;pointer-events:none;
+    transition:opacity .22s, bottom .22s;max-width:88vw;text-align:center}
+  .toast.show{opacity:1;bottom:34px}
+
+  .lock{padding:80px 30px;text-align:center;min-height:100vh}
+  .lock h2{font-family:var(--serif);font-weight:300;font-size:28px;margin:0 0 10px;letter-spacing:-.01em}
+  .lock p{font-size:13px;color:var(--muted);margin:0 0 26px;line-height:1.6}
+  .lock .field{text-align:left;max-width:300px;margin:0 auto 14px}
+  .lock .btn{max-width:300px;margin:6px auto 0}
+  .lock .sm{font-size:12px;color:var(--faint);margin-top:22px}
+</style>
+</head>
+<body>
+
+<div class="app" id="app"><div class="boot">Menü yükleniyor…</div></div>
+<div class="sheet-wrap" id="sheetWrap"></div>
+<div class="toast" id="toast"></div>
+<input type="file" id="restoreInput" accept=".json,application/json" style="display:none" onchange="onRestoreFile(this)">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+<script>
+/* ============================================================
+   BAĞLANTI
+   ============================================================ */
+const SUPA_URL = "https://cjmzeuejnnlmijrlcwuf.supabase.co";
+const SUPA_KEY = "sb_publishable_iN140cdq4pxXxINkxUCYRQ_kH9RRRZg";
+const BUCKET   = "menu-foto";
+const ROW_ID   = "main";
+
+const T = {
+  tr:{ viewMenu:"Menüye git", items:"ürün", allergenTitle:"Alerjen uyarısı",
+       allergenNone:"Bildirilen alerjen yok", emptyMenu:"Menü henüz hazır değil.",
+       emptyCat:"Bu kategoride henüz ürün yok.", back:"Geri", home:"Başa dön", close:"Kapat" },
+  en:{ viewMenu:"View menu", items:"items", allergenTitle:"Allergen notice",
+       allergenNone:"No allergens declared", emptyMenu:"The menu isn't ready yet.",
+       emptyCat:"Nothing in this category yet.", back:"Back", home:"Back to start", close:"Close" }
+};
+
+const ALG = {
+  gluten:{ tr:"Gluten", en:"Gluten", icon:`<path d="M12 21V8.5"/><path d="M12 8.5c0-2.2 1.6-3.9 3.8-3.9-.1 2.3-1.7 3.9-3.8 3.9z"/><path d="M12 8.5c0-2.2-1.6-3.9-3.8-3.9.1 2.3 1.7 3.9 3.8 3.9z"/><path d="M12 14c0-2.2 1.6-3.9 3.8-3.9-.1 2.3-1.7 3.9-3.8 3.9z"/><path d="M12 14c0-2.2-1.6-3.9-3.8-3.9.1 2.3 1.7 3.9 3.8 3.9z"/>` },
+  sut:{ tr:"Süt", en:"Milk", icon:`<path d="M9 3h6l-.6 3.2 2.6 3.6V20a1 1 0 01-1 1H8a1 1 0 01-1-1V9.8l2.6-3.6L9 3z"/><path d="M7 13h10"/>` },
+  yumurta:{ tr:"Yumurta", en:"Egg", icon:`<path d="M12 3c3.4 0 6 4.7 6 9.1A6 6 0 016 12.1C6 7.7 8.6 3 12 3z"/>` },
+  kuruyemis:{ tr:"Kuruyemiş", en:"Tree nuts", icon:`<circle cx="12" cy="14" r="6"/><path d="M6.6 10.4C8.7 7.2 15.3 7.2 17.4 10.4"/>` },
+  fistik:{ tr:"Yer fıstığı", en:"Peanut", icon:`<circle cx="10" cy="8.5" r="4.4"/><circle cx="13.8" cy="15.5" r="4.4"/>` },
+  soya:{ tr:"Soya", en:"Soy", icon:`<path d="M5 18c0-6.6 5.6-12 12.6-12C17.6 12.6 12 18 5 18z"/><circle cx="9.7" cy="13.2" r="1"/><circle cx="13.2" cy="9.7" r="1"/>` },
+  deniz:{ tr:"Deniz ürünü", en:"Fish & shellfish", icon:`<path d="M2.5 12c3-4.2 6.9-5.4 9.9-5.4 3.9 0 6.4 2.5 6.4 5.4s-2.5 5.4-6.4 5.4c-3 0-6.9-1.2-9.9-5.4z"/><path d="M18.8 9.3L22 6.9v10.2l-3.2-2.4"/><circle cx="8.4" cy="11.2" r=".9"/>` },
+  susam:{ tr:"Susam", en:"Sesame", icon:`<ellipse cx="8.3" cy="10" rx="1.9" ry="2.9" transform="rotate(-25 8.3 10)"/><ellipse cx="15.3" cy="9.2" rx="1.9" ry="2.9" transform="rotate(22 15.3 9.2)"/><ellipse cx="11.7" cy="16.2" rx="1.9" ry="2.9" transform="rotate(-4 11.7 16.2)"/>` }
+};
+const ALG_KEYS = Object.keys(ALG);
+const algSvg = k => ALG[k]
+  ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">${ALG[k].icon}</svg>` : "";
+
+/* ============================================================
+   TASLAK
+   ============================================================ */
+const ph = (s,w,h)=>`https://picsum.photos/seed/${s}/${w}/${h}`;
+const L = (tr,en)=>({tr,en});
+
+const TEMPLATE = {
+  venue:{
+    name:"Viva Kahve",
+    tagline:L("Kadıköy · her gün 08.00 – 23.00","Kadıköy · daily 08.00 – 23.00"),
+    welcome:L("Hoş geldin. Menüyü telefonundan rahatça gezebilirsin, her ürünün alerjen bilgisini de yazdık.",
+              "Welcome. Take your time with the menu — we've listed the allergens for every item."),
+    cover:ph("viva-cover",1000,1200)
+  },
+  categories:[
+    {id:"c1",name:L("Kahve","Coffee"),photo:ph("kahve7",600,750)},
+    {id:"c2",name:L("Soğuk içecek","Cold drinks"),photo:ph("soguk4",600,750)},
+    {id:"c3",name:L("Kahvaltı","Breakfast"),photo:ph("kahvalti3",600,750)},
+    {id:"c4",name:L("Tost & sandviç","Toast & sandwiches"),photo:ph("tost5",600,750)},
+    {id:"c5",name:L("Tatlı","Desserts"),photo:ph("tatli9",600,750)},
+    {id:"c6",name:L("Çay & bitki","Tea & herbal"),photo:ph("cay2",600,750)}
+  ],
+  items:[
+    {id:"i01",cat:"c1",price:"75",photo:ph("filtre2",600,600),allergens:[],
+     name:L("Filtre kahve","Filter coffee"),
+     desc:L("Günün çekirdeği, V60 ile demlenir. Hangi çekirdek olduğunu barista'ya sorabilirsin.",
+            "Bean of the day, brewed on a V60. Ask the barista which one it is.")},
+    {id:"i02",cat:"c1",price:"55",photo:ph("espresso1",600,600),allergens:[],
+     name:L("Espresso","Espresso"),
+     desc:L("Tek shot. Yanında maden suyu gelir.","Single shot, served with sparkling water.")},
+    {id:"i03",cat:"c1",price:"95",photo:ph("flatwhite",600,600),allergens:["sut"],
+     name:L("Flat white","Flat white"),
+     desc:L("Çift shot espresso, ipek kıvamında buharlanmış süt.","Double espresso with silky steamed milk.")},
+    {id:"i04",cat:"c1",price:"95",photo:ph("latte3",600,600),allergens:["sut"],
+     name:L("Latte","Latte"),
+     desc:L("Uzun bardakta, süt ağırlıklı. Yulaf sütüyle de yapılır.","Tall glass, milk forward. Oat milk on request.")},
+    {id:"i05",cat:"c1",price:"60",photo:ph("turkkahve",600,600),allergens:["kuruyemis"],
+     name:L("Türk kahvesi","Turkish coffee"),
+     desc:L("Bakır cezvede pişer, yanında lokumla gelir.","Cooked in a copper pot, served with Turkish delight.")},
+    {id:"i06",cat:"c2",price:"85",photo:ph("coldbrew",600,600),allergens:[],
+     name:L("Soğuk demleme","Cold brew"),
+     desc:L("18 saat demlenmiş, buzla servis edilir.","Steeped for 18 hours, served over ice.")},
+    {id:"i07",cat:"c2",price:"70",photo:ph("limonata",600,600),allergens:[],
+     name:L("Limonata","Lemonade"),
+     desc:L("Taze sıkılmış, naneli. Şekeri az.","Freshly squeezed with mint. Lightly sweetened.")},
+    {id:"i08",cat:"c2",price:"120",photo:ph("shake4",600,600),allergens:["sut","gluten","yumurta","soya"],
+     name:L("Kurabiyeli milkshake","Cookie milkshake"),
+     desc:L("Dondurma, süt ve kırılmış kurabiye. Ağır ama iyi.","Ice cream, milk and crushed cookies. Heavy, but good.")},
+    {id:"i09",cat:"c3",price:"420",photo:ph("serpme",600,600),allergens:["gluten","sut","yumurta","kuruyemis"],
+     name:L("Serpme kahvaltı","Turkish breakfast spread"),
+     desc:L("İki kişilik. Köy yumurtası, beş çeşit peynir, ev reçelleri, sıcak ekmek. Çay sınırsız.",
+            "For two. Village eggs, five cheeses, homemade jams, warm bread. Unlimited tea.")},
+    {id:"i10",cat:"c3",price:"180",photo:ph("menemen",600,600),allergens:["yumurta","sut","gluten"],
+     name:L("Menemen","Menemen"),
+     desc:L("Tereyağında, bol domatesli. Yanında bazlama.","Eggs scrambled with tomato in butter. Served with flatbread.")},
+    {id:"i11",cat:"c3",price:"195",photo:ph("avokado8",600,600),allergens:["gluten","susam"],
+     name:L("Avokadolu ekmek","Avocado toast"),
+     desc:L("Ekşi maya ekmek, avokado, susam ve pul biber. Üstüne yumurta eklenebilir.",
+            "Sourdough, avocado, sesame and chilli flakes. Add an egg if you like.")},
+    {id:"i12",cat:"c4",price:"140",photo:ph("tost1",600,600),allergens:["gluten","sut"],
+     name:L("Kaşarlı tost","Cheese toast"),
+     desc:L("Beyaz ekmek, bol kaşar. Yanında turşu.","White bread, plenty of kaşar cheese. Pickles on the side.")},
+    {id:"i13",cat:"c4",price:"210",photo:ph("sandvic6",600,600),allergens:["gluten","yumurta","susam","soya"],
+     name:L("Tavuklu sandviç","Chicken sandwich"),
+     desc:L("Izgara tavuk, marul, ev mayonezi, susamlı ekmek.","Grilled chicken, lettuce, house mayo, sesame bread.")},
+    {id:"i14",cat:"c4",price:"200",photo:ph("ton3",600,600),allergens:["gluten","deniz","yumurta"],
+     name:L("Ton balıklı sandviç","Tuna sandwich"),
+     desc:L("Ton balığı, mısır, közlenmiş biber. Yanında cips.","Tuna, sweetcorn and roasted peppers. Chips on the side.")},
+    {id:"i15",cat:"c5",price:"145",photo:ph("cheesecake",600,600),allergens:["sut","yumurta","gluten"],
+     name:L("San Sebastian","Basque cheesecake"),
+     desc:L("Yüzü yanık, ortası akışkan. Günlük yapılır, akşama kalmaz.",
+            "Burnt on top, molten in the middle. Made daily, rarely lasts the evening.")},
+    {id:"i16",cat:"c5",price:"160",photo:ph("katmer",600,600),allergens:["gluten","sut","kuruyemis"],
+     name:L("Fıstıklı katmer","Pistachio katmer"),
+     desc:L("Antep fıstığı ve kaymak, ince açılmış hamurda.","Antep pistachio and clotted cream in thin pastry.")},
+    {id:"i17",cat:"c5",price:"125",photo:ph("brownie7",600,600),allergens:["gluten","sut","yumurta","kuruyemis","soya"],
+     name:L("Brownie","Brownie"),
+     desc:L("Sıcak servis edilir, içinde ceviz var.","Served warm, with walnuts.")},
+    {id:"i18",cat:"c6",price:"40",photo:ph("cay9",600,600),allergens:[],
+     name:L("Demleme çay","Turkish tea"),
+     desc:L("İnce belli bardakta. İkinci bardak yarı fiyat.","In a tulip glass. Second glass half price.")},
+    {id:"i19",cat:"c6",price:"55",photo:ph("adacayi",600,600),allergens:[],
+     name:L("Ada çayı","Sage tea"),
+     desc:L("Taze yaprak, limonlu.","Fresh leaves, with lemon.")}
+  ]
+};
+
+/* ============================================================
+   DURUM
+   ============================================================ */
+let data=null, fromDb=false, token=null;
+let stage="intro", catOpen=null, lang="tr";
+let adminTab="venue", saving=false;
+let editingItem=null, editingCat=null, catDraftPhoto=null, itemDraftPhoto=null;
+
+const isPanel = () => location.hash.replace("#","").toLowerCase()==="panel";
+function tx(v){ if(v==null) return ""; if(typeof v==="string") return v; return v[lang]||v.tr||v.en||""; }
+const t = k => T[lang][k];
+const uid=()=>Math.random().toString(36).slice(2,8);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function toast(m,ms=2300){
+  const el=document.getElementById("toast");
+  el.textContent=m; el.classList.add("show");
+  clearTimeout(el._t); el._t=setTimeout(()=>el.classList.remove("show"),ms);
+}
+
+const headers = (extra={}) => Object.assign({
+  apikey: SUPA_KEY, Authorization: "Bearer " + (token||SUPA_KEY)
+}, extra);
+
+async function dbLoad(){
+  const r = await fetch(`${SUPA_URL}/rest/v1/menu?id=eq.${ROW_ID}&select=data`, {headers: headers()});
+  if(!r.ok) throw new Error("okunamadi");
+  const rows = await r.json();
+  if(rows.length && rows[0].data){ data=rows[0].data; fromDb=true; }
+  else { data=JSON.parse(JSON.stringify(TEMPLATE)); fromDb=false; }
+}
+async function dbSave(msg){
+  if(!token){ toast("Önce panele giriş yapmalısın"); return false; }
+  saving=true; render();
+  try{
+    const r = await fetch(`${SUPA_URL}/rest/v1/menu`, {
+      method:"POST",
+      headers: headers({ "Content-Type":"application/json", Prefer:"resolution=merge-duplicates" }),
+      body: JSON.stringify([{ id:ROW_ID, data }])
+    });
+    if(!r.ok) throw new Error(await r.text());
+    fromDb=true; if(msg) toast(msg); return true;
+  }catch(e){
+    toast("Kaydedilemedi. Oturumun düşmüş olabilir, çıkıp tekrar gir.",3600); return false;
+  }finally{ saving=false; render(); }
+}
+async function login(email,pass){
+  const r = await fetch(`${SUPA_URL}/auth/v1/token?grant_type=password`, {
+    method:"POST", headers:{ apikey:SUPA_KEY, "Content-Type":"application/json" },
+    body: JSON.stringify({ email, password:pass })
+  });
+  if(!r.ok) return false;
+  token = (await r.json()).access_token; return true;
+}
+
+function uploadPhoto(file,done){
+  if(!file) return;
+  if(!token){ toast("Fotoğraf yüklemek için giriş gerekiyor"); return; }
+  toast("Fotoğraf yükleniyor…",9000);
+  const fr=new FileReader();
+  fr.onload=()=>{
+    const img=new Image();
+    img.onload=()=>{
+      const max=1400; let w=img.width,h=img.height;
+      if(Math.max(w,h)>max){const s=max/Math.max(w,h);w=Math.round(w*s);h=Math.round(h*s);}
+      const cv=document.createElement("canvas"); cv.width=w; cv.height=h;
+      cv.getContext("2d").drawImage(img,0,0,w,h);
+      cv.toBlob(async blob=>{
+        const path=`${Date.now()}-${uid()}.jpg`;
+        try{
+          const r=await fetch(`${SUPA_URL}/storage/v1/object/${BUCKET}/${path}`,{
+            method:"POST", headers: headers({ "Content-Type":"image/jpeg" }), body: blob });
+          if(!r.ok) throw new Error(await r.text());
+          toast("Fotoğraf yüklendi");
+          done(`${SUPA_URL}/storage/v1/object/public/${BUCKET}/${path}`);
+        }catch(e){ toast("Fotoğraf yüklenemedi",3200); }
+      },"image/jpeg",.8);
+    };
+    img.onerror=()=>toast("Bu dosya okunamadı");
+    img.src=fr.result;
+  };
+  fr.readAsDataURL(file);
+}
+
+/* ============================================================
+   YEDEK
+   ============================================================ */
+function backupNow(){
+  const stamp = new Date().toISOString().slice(0,10);
+  const blob = new Blob([JSON.stringify(data,null,2)], {type:"application/json"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `menu-yedek-${stamp}.json`;
+  a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+  toast("Yedek indirildi");
+}
+function pickRestore(){ document.getElementById("restoreInput").click(); }
+function onRestoreFile(el){
+  const f = el.files[0]; el.value="";
+  if(!f) return;
+  const fr = new FileReader();
+  fr.onload = () => {
+    try{
+      const p = JSON.parse(fr.result);
+      if(!p || !p.venue || !Array.isArray(p.categories) || !Array.isArray(p.items))
+        return toast("Bu dosya menü yedeği değil",3200);
+      if(!confirm(`Yedekteki menü yüklenecek: ${p.categories.length} kategori, ${p.items.length} ürün. Şu anki menünün üzerine yazılacak. Emin misin?`)) return;
+      data = p; editingItem=null; editingCat=null;
+      render(); toast("Yedek yüklendi, kaydetmeyi unutma",3200);
+    }catch(e){ toast("Dosya okunamadı",3000); }
+  };
+  fr.readAsText(f);
+}
+
+/* ============================================================
+   MÜŞTERİ
+   ============================================================ */
+function langToggle(cls=""){
+  return `<div class="lang ${cls}" role="group" aria-label="Dil">
+    <button aria-pressed="${lang==='tr'}" onclick="setLang('tr')">TR</button>
+    <button aria-pressed="${lang==='en'}" onclick="setLang('en')">EN</button>
+  </div>`;
+}
+function setLang(l){ if(lang===l) return; lang=l; closeItem(); render(); }
+
+function guestIntro(){
+  const w = tx(data.venue.welcome);
+  return `<div class="intro">
+    ${langToggle("lang-float")}
+    <img class="intro-photo" src="${esc(data.venue.cover)}" alt="">
+    <div class="intro-body">
+      <h1>${esc(data.venue.name)}</h1>
+      ${w ? `<p class="welcome">${esc(w)}</p>` : ""}
+      <button class="btn" onclick="goMenu()">${t("viewMenu")}</button>
+      <p class="hours">${esc(tx(data.venue.tagline))}</p>
+    </div>
+  </div>`;
+}
+function goMenu(){ stage="home"; render(); window.scrollTo(0,0); }
+function goIntro(){ stage="intro"; catOpen=null; render(); window.scrollTo(0,0); }
+
+function guestHome(){
+  const cats = data.categories.map(c=>{
+    const n = data.items.filter(i=>i.cat===c.id).length;
+    return `<button class="cat" onclick="openCat('${c.id}')">
+      <img src="${esc(c.photo)}" alt="">
+      <h2>${esc(tx(c.name))}</h2>
+      <span>${n} ${t("items")}</span>
+    </button>`;
+  }).join("");
+  return `<div class="masthead">
+      <button class="home-back" onclick="goIntro()" aria-label="${t("home")}">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      ${langToggle()}
+      <h1>${esc(data.venue.name)}</h1>
+      <p>${esc(tx(data.venue.tagline))}</p>
+      <div class="masthead-rule"></div>
+    </div>
+    <div class="cats">${cats || `<div class="cats-empty">${t("emptyMenu")}</div>`}</div>`;
+}
+
+function guestCat(){
+  const c = data.categories.find(x=>x.id===catOpen);
+  if(!c){ catOpen=null; return guestHome(); }
+  const rows = data.items.filter(i=>i.cat===c.id).map(i=>{
+    const icons=(i.allergens||[]).map(k=>algSvg(k)).join("");
+    return `<button class="item" onclick="openItem('${i.id}')">
+      <span class="item-body">
+        <h3>${esc(tx(i.name))}</h3>
+        <p>${esc(tx(i.desc))}</p>
+        <span class="item-foot">
+          <span class="item-price">${esc(i.price)} ₺</span>
+          ${icons?`<span class="item-alg">${icons}</span>`:""}
+        </span>
+      </span>
+      <img class="item-thumb" src="${esc(i.photo)}" alt="">
+    </button>`;
+  }).join("");
+  return `<div class="subbar">
+      <button class="back" onclick="closeCat()" aria-label="${t("back")}">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <h2>${esc(tx(c.name))}</h2>
+      ${langToggle()}
+    </div>
+    <div class="items">${rows || `<div class="cats-empty">${t("emptyCat")}</div>`}</div>`;
+}
+function openCat(id){ catOpen=id; render(); window.scrollTo(0,0); }
+function closeCat(){ catOpen=null; render(); }
+
+function openItem(id){
+  const i=data.items.find(x=>x.id===id);
+  if(!i) return;
+  const list=(i.allergens||[]).map(k=>
+    `<span class="alg-item">${algSvg(k)}${esc(ALG[k]?ALG[k][lang]:k)}</span>`).join("");
+  document.getElementById("sheetWrap").innerHTML = `
+    <div class="sheet-bg" onclick="closeItem()"></div>
+    <div class="sheet" role="dialog" aria-label="${esc(tx(i.name))}">
+      <img class="sheet-photo" src="${esc(i.photo)}" alt="">
+      <button class="sheet-close" onclick="closeItem()" aria-label="${t("close")}">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+      <div class="sheet-body">
+        <h3>${esc(tx(i.name))}</h3>
+        <p class="sheet-price">${esc(i.price)} ₺</p>
+        <p class="desc">${esc(tx(i.desc))}</p>
+        <div class="allergens">
+          <p>${t("allergenTitle")}</p>
+          ${list?`<div class="alg-list">${list}</div>`:`<div class="alg-none">${t("allergenNone")}</div>`}
+        </div>
+      </div>
+    </div>`;
+  document.getElementById("sheetWrap").classList.add("open");
+}
+function closeItem(){
+  const w=document.getElementById("sheetWrap");
+  w.classList.remove("open"); w.innerHTML="";
+}
+
+/* ============================================================
+   PANEL
+   ============================================================ */
+function adminLock(){
+  return `<div class="lock">
+    <h2>Yönetim paneli</h2>
+    <p>Supabase'de oluşturduğun e-posta ve şifreyle gir.</p>
+    <div class="field"><label for="lgMail">E-posta</label>
+      <input type="email" id="lgMail" autocomplete="username" placeholder="sen@ornek.com"></div>
+    <div class="field"><label for="lgPass">Şifre</label>
+      <input type="password" id="lgPass" autocomplete="current-password" placeholder="••••••••"></div>
+    <button class="btn" id="lgBtn" onclick="doLogin()">Gir</button>
+    <p class="sm">Menüyü görmek için adresin sonundaki #panel kısmını sil.</p>
+  </div>`;
+}
+async function doLogin(){
+  const mail=document.getElementById("lgMail").value.trim();
+  const pass=document.getElementById("lgPass").value;
+  if(!mail||!pass) return toast("E-posta ve şifre gerekli");
+  const b=document.getElementById("lgBtn"); b.disabled=true; b.textContent="Giriliyor…";
+  const ok=await login(mail,pass);
+  if(!ok){ b.disabled=false; b.textContent="Gir"; return toast("E-posta veya şifre yanlış"); }
+  try{ await dbLoad(); }catch(e){}
+  render();
+}
+function logout(){ token=null; adminTab="venue"; render(); }
+
+function adminShell(inner){
+  const tb=(id,label)=>`<button role="tab" aria-selected="${adminTab===id}" onclick="setTab('${id}')">${label}</button>`;
+  return `<div>
+    <div class="adm-top">
+      <div class="grow">
+        <h2>${esc(data.venue.name)}</h2>
+        <p>${fromDb?"Kaydettiğin an müşterilerde yayında.":"Bu menü henüz yayında değil. Kaydet, yayına girsin."}</p>
+      </div>
+      <button class="logout" onclick="logout()">Çıkış</button>
+    </div>
+    <div class="tabs" role="tablist">${tb("venue","Mekan")}${tb("cats","Kategoriler")}${tb("items","Ürünler")}${tb("qr","Karekod")}${tb("backup","Yedek")}</div>
+    <div class="panel">${inner}</div>
+  </div>`;
+}
+function setTab(x){ adminTab=x; editingItem=null; editingCat=null; catDraftPhoto=null; itemDraftPhoto=null; render(); }
+const pair = o => (o && typeof o==="object") ? o : {tr:o||"",en:""};
+const saveLabel = base => saving ? "Kaydediliyor…" : base;
+
+function panelVenue(){
+  const tag=pair(data.venue.tagline), wel=pair(data.venue.welcome);
+  return `
+    <div class="field"><label for="vName">Mekan adı</label>
+      <input type="text" id="vName" value="${esc(data.venue.name)}">
+      <p class="hint">İki dilde de aynı görünür.</p></div>
+    <div class="field"><label for="vTagTr"><span class="flag">TR</span>Alt satır</label>
+      <input type="text" id="vTagTr" value="${esc(tag.tr)}" placeholder="Semt · çalışma saatleri"></div>
+    <div class="field"><label for="vTagEn"><span class="flag">EN</span>Alt satır</label>
+      <input type="text" id="vTagEn" value="${esc(tag.en)}" placeholder="Neighbourhood · opening hours"></div>
+    <div class="field"><label for="vWelTr"><span class="flag">TR</span>Karşılama yazısı</label>
+      <textarea id="vWelTr" placeholder="Giriş sayfasında görünür.">${esc(wel.tr)}</textarea></div>
+    <div class="field"><label for="vWelEn"><span class="flag">EN</span>Karşılama yazısı</label>
+      <textarea id="vWelEn" placeholder="Shown on the intro screen.">${esc(wel.en)}</textarea>
+      <p class="hint">Üç satırı geçmesin, giriş ekranında kırpılıyor.</p></div>
+    <div class="field"><label>Giriş fotoğrafı</label>
+      <label class="drop">
+        <img src="${esc(data.venue.cover)}" alt="">
+        <span class="drop-txt">Değiştirmek için dokun<br>Dikey fotoğraf en iyi durur, ekranı kaplıyor</span>
+        <input type="file" accept="image/*" onchange="onVenueCover(this)">
+      </label></div>
+    <button class="btn" ${saving?"disabled":""} onclick="saveVenue()">${saveLabel("Kaydet ve yayınla")}</button>
+    <div class="hr"></div>
+    <p class="sec-title">Baştan başla</p>
+    <button class="btn quiet" onclick="resetTemplate()">Taslak menüyü geri yükle</button>
+    <p class="hint">Menüyü örnek haline döndürür. Kaydedene kadar yayına yansımaz.</p>`;
+}
+function onVenueCover(el){ uploadPhoto(el.files[0], url=>{ data.venue.cover=url; render(); }); }
+function saveVenue(){
+  const g=id=>document.getElementById(id).value.trim();
+  data.venue.name=g("vName")||"Mekan adı";
+  data.venue.tagline={tr:g("vTagTr"),en:g("vTagEn")};
+  data.venue.welcome={tr:g("vWelTr"),en:g("vWelEn")};
+  dbSave("Yayınlandı");
+}
+function resetTemplate(){
+  if(!confirm("Menü örnek haline dönecek. Emin misin?")) return;
+  data=JSON.parse(JSON.stringify(TEMPLATE));
+  editingItem=null; editingCat=null; render(); toast("Taslak yüklendi, kaydetmeyi unutma");
+}
+
+function panelBackup(){
+  const n = data.items.length, c = data.categories.length;
+  return `
+    <p class="sec-title">Yedek al</p>
+    <p class="hint" style="margin:0 0 12px">Şu anki menü: ${c} kategori, ${n} ürün. Tek dosya olarak bilgisayarına iner. Menüyü doldurduktan sonra bir kere al, bir yerde sakla.</p>
+    <button class="btn" onclick="backupNow()">Yedeği indir</button>
+    <div class="hr"></div>
+    <p class="sec-title">Yedeği geri yükle</p>
+    <p class="hint" style="margin:0 0 12px">Daha önce indirdiğin yedek dosyasını seç. Menü o haline döner, sonra kaydetmen gerekiyor.</p>
+    <button class="btn ghost" onclick="pickRestore()">Yedek dosyası seç</button>
+    <div class="hr"></div>
+    <p class="hint">Yedek yazıları, fiyatları ve alerjenleri taşıyor. Fotoğrafların kendisini değil, adreslerini tutuyor — fotoğrafları ayrıca kendi bilgisayarında da sakla.</p>`;
+}
+
+function panelCats(){
+  const rows=data.categories.map(c=>{
+    const p=pair(c.name);
+    return `<div class="list-row">
+      <img src="${esc(c.photo)}" alt="">
+      <div class="meta"><strong>${esc(p.tr)}</strong>
+        <small>${data.items.filter(i=>i.cat===c.id).length} ürün · ${p.en?esc(p.en):`<span class="warn">EN yok</span>`}</small></div>
+      <button class="icon-btn" onclick="editCat('${c.id}')" aria-label="Düzenle">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg></button>
+      <button class="icon-btn" onclick="delCat('${c.id}')" aria-label="Sil">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg></button>
+    </div>`;
+  }).join("");
+  const c=editingCat?data.categories.find(x=>x.id===editingCat):null;
+  const n=pair(c?c.name:null);
+  return `
+    <p class="sec-title">Menüdeki kategoriler</p>
+    ${rows?`<div class="list">${rows}</div>`:`<p class="empty">Henüz kategori yok.</p>`}
+    <div class="hr"></div>
+    <p class="sec-title">${c?"Kategoriyi düzenle":"Yeni kategori"}</p>
+    <div class="field"><label for="cNameTr"><span class="flag">TR</span>Adı</label>
+      <input type="text" id="cNameTr" value="${c?esc(n.tr):""}" placeholder="Kahve, Tatlı, Kahvaltı…"></div>
+    <div class="field"><label for="cNameEn"><span class="flag">EN</span>Adı</label>
+      <input type="text" id="cNameEn" value="${c?esc(n.en):""}" placeholder="Coffee, Desserts, Breakfast…"></div>
+    <div class="field"><label>Kategori fotoğrafı</label>
+      <label class="drop">
+        <img src="${c?esc(c.photo):(catDraftPhoto||ph("bos",200,200))}" alt="">
+        <span class="drop-txt">Seçmek için dokun<br>Dikey fotoğraf en iyi durur</span>
+        <input type="file" accept="image/*" onchange="onCatPhoto(this)">
+      </label></div>
+    <div class="btn-row">
+      <button class="btn" ${saving?"disabled":""} onclick="saveCat()">${saveLabel(c?"Kaydet ve yayınla":"Ekle ve yayınla")}</button>
+      ${c?`<button class="btn ghost" onclick="setTab('cats')">Vazgeç</button>`:""}
+    </div>`;
+}
+function onCatPhoto(el){ uploadPhoto(el.files[0], url=>{ catDraftPhoto=url; if(editingCat){ data.categories.find(x=>x.id===editingCat).photo=url; } render(); }); }
+function editCat(id){ editingCat=id; catDraftPhoto=null; adminTab="cats"; render(); }
+function delCat(id){
+  const n=data.items.filter(i=>i.cat===id).length;
+  if(!confirm(n?`Bu kategori ve içindeki ${n} ürün silinecek. Emin misin?`:"Kategori silinecek. Emin misin?")) return;
+  data.categories=data.categories.filter(c=>c.id!==id);
+  data.items=data.items.filter(i=>i.cat!==id);
+  editingCat=null; dbSave("Silindi");
+}
+function saveCat(){
+  const tr=document.getElementById("cNameTr").value.trim();
+  const en=document.getElementById("cNameEn").value.trim();
+  if(!tr) return toast("Türkçe kategori adı gerekli");
+  if(editingCat){
+    const c=data.categories.find(x=>x.id===editingCat);
+    c.name={tr,en}; if(catDraftPhoto) c.photo=catDraftPhoto;
+  }else{
+    data.categories.push({id:uid(),name:{tr,en},photo:catDraftPhoto||ph(uid(),600,750)});
+  }
+  editingCat=null; catDraftPhoto=null; dbSave("Yayınlandı");
+}
+
+function panelItems(){
+  if(!data.categories.length)
+    return `<p class="empty">Ürün eklemek için önce bir kategori oluştur.</p>
+            <button class="btn ghost" onclick="setTab('cats')">Kategorilere git</button>`;
+  const rows=data.items.map(i=>{
+    const c=data.categories.find(x=>x.id===i.cat);
+    const nm=pair(i.name);
+    return `<div class="list-row">
+      <img src="${esc(i.photo)}" alt="">
+      <div class="meta"><strong>${esc(nm.tr)}</strong>
+        <small>${c?esc(pair(c.name).tr):"—"} · ${esc(i.price)} ₺${nm.en?"":` · <span class="warn">EN yok</span>`}</small></div>
+      <button class="icon-btn" onclick="editItem('${i.id}')" aria-label="Düzenle">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg></button>
+      <button class="icon-btn" onclick="delItem('${i.id}')" aria-label="Sil">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg></button>
+    </div>`;
+  }).join("");
+  const it=editingItem?data.items.find(x=>x.id===editingItem):null;
+  const nm=pair(it?it.name:null), ds=pair(it?it.desc:null);
+  const opts=data.categories.map(c=>`<option value="${c.id}" ${it&&it.cat===c.id?"selected":""}>${esc(pair(c.name).tr)}</option>`).join("");
+  const algBoxes=ALG_KEYS.map(k=>`
+    <label><input type="checkbox" name="alg" value="${k}" ${it&&(it.allergens||[]).includes(k)?"checked":""}>
+      ${algSvg(k)}<span>${ALG[k].tr}</span></label>`).join("");
+  return `
+    <p class="sec-title">Ürünler</p>
+    ${rows?`<div class="list">${rows}</div>`:`<p class="empty">Henüz ürün yok.</p>`}
+    <div class="hr"></div>
+    <p class="sec-title">${it?"Ürünü düzenle":"Yeni ürün"}</p>
+    <div class="field"><label for="iNameTr"><span class="flag">TR</span>Ürün adı</label>
+      <input type="text" id="iNameTr" value="${it?esc(nm.tr):""}" placeholder="Flat white"></div>
+    <div class="field"><label for="iNameEn"><span class="flag">EN</span>Ürün adı</label>
+      <input type="text" id="iNameEn" value="${it?esc(nm.en):""}" placeholder="Flat white"></div>
+    <div class="row">
+      <div class="field"><label for="iCat">Kategori</label><select id="iCat">${opts}</select></div>
+      <div class="field"><label for="iPrice">Fiyat (₺)</label>
+        <input type="number" id="iPrice" value="${it?esc(it.price):""}" placeholder="95"></div>
+    </div>
+    <div class="field"><label for="iDescTr"><span class="flag">TR</span>Açıklama</label>
+      <textarea id="iDescTr" placeholder="Müşteri ürüne dokunduğunda bunu görecek.">${it?esc(ds.tr):""}</textarea></div>
+    <div class="field"><label for="iDescEn"><span class="flag">EN</span>Açıklama</label>
+      <textarea id="iDescEn" placeholder="Shown when the guest taps the item.">${it?esc(ds.en):""}</textarea></div>
+    <div class="field"><label>Fotoğraf</label>
+      <label class="drop">
+        <img src="${it?esc(it.photo):(itemDraftPhoto||ph("bosurun",200,200))}" alt="">
+        <span class="drop-txt">Seçmek için dokun<br>Kare fotoğraf en iyi durur</span>
+        <input type="file" accept="image/*" onchange="onItemPhoto(this)">
+      </label></div>
+    <div class="field"><label>Alerjenler</label>
+      <div class="alg-grid">${algBoxes}</div>
+      <p class="hint">Seçtiklerin ürün sayfasında ikonlarıyla ve müşterinin diliyle görünür.</p></div>
+    <div class="btn-row">
+      <button class="btn" ${saving?"disabled":""} onclick="saveItem()">${saveLabel(it?"Kaydet ve yayınla":"Ekle ve yayınla")}</button>
+      ${it?`<button class="btn ghost" onclick="setTab('items')">Vazgeç</button>`:""}
+    </div>`;
+}
+function onItemPhoto(el){ uploadPhoto(el.files[0], url=>{ itemDraftPhoto=url; if(editingItem){ data.items.find(x=>x.id===editingItem).photo=url; } render(); }); }
+function editItem(id){ editingItem=id; itemDraftPhoto=null; adminTab="items"; render(); window.scrollTo(0,document.body.scrollHeight); }
+function delItem(id){
+  if(!confirm("Ürün silinecek. Emin misin?")) return;
+  data.items=data.items.filter(i=>i.id!==id);
+  editingItem=null; dbSave("Silindi");
+}
+function saveItem(){
+  const g=id=>document.getElementById(id).value.trim();
+  const nameTr=g("iNameTr"), price=g("iPrice");
+  if(!nameTr) return toast("Türkçe ürün adı gerekli");
+  if(!price) return toast("Fiyat gerekli");
+  const payload={
+    cat:document.getElementById("iCat").value,
+    name:{tr:nameTr,en:g("iNameEn")},
+    desc:{tr:g("iDescTr"),en:g("iDescEn")},
+    price,
+    allergens:[...document.querySelectorAll('input[name=alg]:checked')].map(x=>x.value)
+  };
+  if(editingItem){
+    const i=data.items.find(x=>x.id===editingItem);
+    Object.assign(i,payload);
+    if(itemDraftPhoto) i.photo=itemDraftPhoto;
+  }else{
+    data.items.push({id:uid(),...payload,photo:itemDraftPhoto||ph(uid(),600,600)});
+  }
+  editingItem=null; itemDraftPhoto=null; dbSave("Yayınlandı");
+}
+
+function panelQR(){
+  const url = location.origin + location.pathname;
+  setTimeout(()=>{
+    const holder=document.getElementById("qrHolder");
+    if(!holder) return;
+    if(typeof QRious!=="undefined"){
+      const cv=document.createElement("canvas"); holder.appendChild(cv);
+      new QRious({element:cv,value:url,size:200,background:"#FFFFFF",foreground:"#1E201C",level:"H"});
+      holder._cv=cv;
+    }else{
+      holder.innerHTML=`<div class="qr-fallback">Karekod üretilemedi. İnternet bağlantını kontrol et.</div>`;
+    }
+  },0);
+  return `
+    <div class="qr-box">
+      <div id="qrHolder"></div>
+      <p class="qr-link">${esc(url)}</p>
+      <button class="btn ghost" onclick="downloadQR()">Karekodu indir</button>
+    </div>
+    <p class="qr-help">Karekod menünün yayındaki adresini taşıyor. Müşteri hangi dili seçerse o dilde geziyor. Menüyü sonradan değiştirmen karekodu etkilemiyor.</p>`;
+}
+function downloadQR(){
+  const h=document.getElementById("qrHolder");
+  if(!h||!h._cv) return toast("Karekod hazır değil");
+  const a=document.createElement("a");
+  a.href=h._cv.toDataURL("image/png"); a.download="karekod.png"; a.click();
+}
+
+function render(){
+  const app=document.getElementById("app");
+  if(!data){ app.innerHTML=`<div class="boot">Menü yükleniyor…</div>`; return; }
+  if(isPanel()){
+    app.innerHTML = token ? adminShell(
+      adminTab==="venue"?panelVenue():
+      adminTab==="cats"?panelCats():
+      adminTab==="items"?panelItems():
+      adminTab==="backup"?panelBackup():panelQR()
+    ) : adminLock();
+  }else{
+    app.innerHTML = stage==="intro" ? guestIntro() : (catOpen ? guestCat() : guestHome());
+  }
+}
+window.addEventListener("hashchange", ()=>{ closeItem(); stage="intro"; catOpen=null; render(); });
+
+(async function boot(){
+  try{ await dbLoad(); }
+  catch(e){
+    data=JSON.parse(JSON.stringify(TEMPLATE));
+    toast("Menü sunucudan okunamadı, örnek menü gösteriliyor.",4000);
+  }
+  render();
+})();
+</script>
+</body>
+</html>
